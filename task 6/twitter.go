@@ -1,64 +1,40 @@
 package main
 
-
 import (
-    
-    
     "github.com/dghubble/go-twitter/twitter"
     "github.com/dghubble/oauth1"
-    
-    
-	"log"
-	"os"
-	"fmt"
+    "os"
+    "flag"
+    "fmt"
+	
 )
 
-type Credentials struct {
-    ConsumerKey       string
-    ConsumerSecret    string
-    AccessToken       string
-    AccessTokenSecret string
-}
-func getClient(creds *Credentials) (*twitter.Client, error) {
-    
-    config := oauth1.NewConfig(creds.ConsumerKey, creds.ConsumerSecret)
-    
-    token := oauth1.NewToken(creds.AccessToken, creds.AccessTokenSecret)
-
-    httpClient := config.Client(oauth1.NoContext, token)
-    
-    client := twitter.NewClient(httpClient)
-
-    
-    verifyParams := &twitter.AccountVerifyParams{
-        SkipStatus:   twitter.Bool(true),
-        IncludeEmail: twitter.Bool(true),
-    }
-      
-    user, _, err := client.Accounts.VerifyCredentials(verifyParams)
-    if err != nil {
-        return nil, err
-    }
-
-    log.Printf("User's ACCOUNT:\n%+v\n", user)
-    return client, nil
-}
 func main() {
     
-    creds := Credentials{
-        AccessToken:       os.Getenv("1168486308882173952-wL37ykXc8O700Uh0Bv3BbxgRmrYfX9"),
-        AccessTokenSecret: os.Getenv("T4DwOuFtzfQSxGRlKyldthmKtHWgXcKmXvuh8GVtoNwf9"),
-        ConsumerKey:       os.Getenv("Tts8r6QfmHku8UFWLm8G1BCfA"),
-        ConsumerSecret:    os.Getenv("4qz2TS5Y5HmLWKaeGln6rjWoOCBMhc0wx9TdHWjO2PQixKVUb9"),
-    }
+	var name string
+	fmt.Println("What is the twitter username you want to get the followers of?")
+    fmt.Scanln(&name)
+    k := flag.String("twitterHandle", name , "twitter handle of a user")
+    flag.Parse()
+    config := oauth1.NewConfig("Tts8r6QfmHku8UFWLm8G1BCfA", "4qz2TS5Y5HmLWKaeGln6rjWoOCBMhc0wx9TdHWjO2PQixKVUb9")
+    token := oauth1.NewToken("1168486308882173952-wL37ykXc8O700Uh0Bv3BbxgRmrYfX9", "T4DwOuFtzfQSxGRlKyldthmKtHWgXcKmXvuh8GVtoNwf9")
+    httpClient := config.Client(oauth1.NoContext, token)
+    client := twitter.NewClient(httpClient)
+    f, err := os.Create("Marco.txt")
 
-    client, err := getClient(&creds)
-    if err != nil {
-        log.Println("Error getting Twitter Client")
-        log.Println(err)
+    params := &twitter.FollowerListParams{
+        ScreenName: *k,
     }
-
     
-    fmt.Printf("%+v\n", client)
-
+    followers, resp, err := client.Followers.List(params)
+    var count int = 0;
+    fmt.Println(resp, err)
+    f.WriteString("Followers - " + *k)
+    for _, follower := range followers.Users {
+    count++
+    f.WriteString("\n" + follower.ScreenName)
+    }
+    f.WriteString("\n")
+    f.WriteString(fmt.Sprintf("\n", count))
+    f.Close()
 }
