@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="css/aah.css"/>
+<body background="https://hdqwalls.com/download/anonymus-hacker-2048x1152.jpg">
+<center>
+  <div id="container">
+          <style>
+                  #h1 {background-color:rgb(255, 255, 0);
+                    @import url(http://fonts.googleapis.com/css?family=Raleway);
+                    div.container{
+                    font-family: 'Raleway', sans-serif;
+                    }
+  }
+          </style>
+  <h1 id="h1">Search a Github Username</h1>
+  <input type="text" id="marco" placeholder="Enter the username">
+  <br><div id="Username"></div>
+  <br><div id="Name"></div></br>
+  <br><div id="Bio"></div></br>
+  <br><img id="Avatar" height="0" width="0"></img></br>
+  <button onclick="search()">Search</button>
+  </div>
+  <script>
+
+  var input = document.getElementById("marco");
+  input.addEventListener("keyup", function(event) {
+    if (event.keyCode === 13) {
+     event.preventDefault();
+     document.getElementById("button").click();
+    }
+  });
+              function search() {
+                  var login = document.getElementById("marco").value;
+                  var query = `query marco($login: String!) {
+                                  user(login: $login) {
+                                      websiteUrl
+                                      login
+                                      name
+                                      avatarUrl
+                                      bio
+                                  }
+                              }`
+                  fetch('https://api.github.com/graphql', {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json',
+                          'Accept': 'application/json',
+                          'Authorization': 'bearer 9852afde5e8b85f7470c06d2a969cc1554be4f20',
+                      },
+                      body: JSON.stringify({
+                          query,
+                          variables: { login },
+                      })
+                  })
+                      .then(r => r.json())
+                      .then(data => {
+                              if(data.data.marco!=null)
+
+
+                              {
+                              document.getElementById("Username").innerHTML = data.data.marco.login;
+                              document.getElementById("Name").innerHTML = data.data.marco.name;
+                              document.getElementById("Bio").innerHTML =  data.data.marco.bio;
+                              document.getElementById("Avatar").src = data.data.marco.avatarUrl;
+                              document.getElementById("Avatar").height = 400;
+                              document.getElementById("Avatar").width = 300;
+                              document.getElementById("Avatar").style ="border:5px solid black"
+                              document.getElementById("noUser").hidden= true;
+                              document.getElementById("Username").hidden = false;
+                              document.getElementById("Name").hidden = false;
+                              document.getElementById("Bio").hidden= false;
+
+                              }
+                      }
+                      )
+                      .catch(function(err){
+                          console.log('Error ', err);
+                      });
+              }
+          </script>
+
+</center>
+</head>
+</html>
